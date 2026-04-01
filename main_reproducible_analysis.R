@@ -11,8 +11,11 @@ library(fastshap)
 
 set.seed(100)
 
-# Data loading and preprocessing
-data_raw <- read.csv("data/cardio_train.csv", sep = ";")
+if (requireNamespace("rstudioapi", quietly = TRUE)) {
+  setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+}
+
+data_raw <- read.csv("cardio_train.csv", sep = ";")
 
 data <- data_raw %>%
   select(-id) %>%
@@ -49,7 +52,11 @@ write.csv(print(tab1, quote = FALSE, noSpaces = TRUE, printToggle = FALSE, showA
 ctrl <- trainControl(method = "cv", number = 5, savePredictions = "final",
                      classProbs = TRUE, summaryFunction = twoClassSummary)
 
-grid_rf  <- data.frame(mtry = 3)
+grid_rf <- data.frame(
+  mtry = 3,
+  splitrule = "gini",
+  min.node.size = 10
+)
 grid_gbm <- expand.grid(n.trees = 100, interaction.depth = 3,
                         shrinkage = 0.1, n.minobsinnode = 10)
 
